@@ -30,7 +30,6 @@ def get_type_with_name(name):
 def get_all_images_files(path):
     result = []
     labels = []
-    labels_index = []
     for name in os.listdir(path):
         sub_path = os.path.join(path, name)
         if os.path.isdir(sub_path):
@@ -39,10 +38,9 @@ def get_all_images_files(path):
                 _, ext = os.path.splitext(file_path)
                 if ext.lower() == ".jpg":
                     result.append(file_path)
-                    labels.append(name)
-                    labels_index.append(get_type_with_name(name))
+                    labels.append(get_type_with_name(name))
 
-    return result, labels, labels_index
+    return result, labels
 
 
 def find_min_width_and_height(files):
@@ -69,7 +67,7 @@ def resize_images(files, w, h):
     return result
 
 
-image_files, image_labels, image_label_index = get_all_images_files(flower_photos_path)
+image_files, image_labels = get_all_images_files(flower_photos_path)
 min_width, min_height = find_min_width_and_height(image_files)
 
 
@@ -79,23 +77,23 @@ c = 3
 
 image_array = resize_images(image_files, width, height)
 image_array = np.asarray(image_array, np.float32)
-image_label_index = np.asarray(image_label_index, np.int32)
+image_labels = np.asarray(image_labels, np.int32)
 
 num_example = image_array.shape[0]
 arr = np.arange(num_example)
 np.random.shuffle(arr)
 
 image_array = image_array[arr]
-image_label_index = image_label_index[arr]
+image_labels = image_labels[arr]
 
 ratio = 0.8
 s = np.int(num_example * ratio)
 
 x_train = image_array[:s]
-y_train = image_label_index[:s]
+y_train = image_labels[:s]
 
 x_val = image_array[s:]
-y_val = image_label_index[s:]
+y_val = image_labels[s:]
 
 
 x = tf.placeholder(tf.float32, shape=[None, width, height, c], name="x")
